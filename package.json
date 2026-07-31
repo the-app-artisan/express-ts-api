@@ -1,0 +1,26 @@
+{
+  "name": "express-ts-api",
+  "version": "1.0.0",
+  "description": "A modern REST API built from scratch with TypeScript, Express, Prisma ORM, JWT authentication, and Zod. This repository contains the source code for the accompanying YouTube course.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/the-app-artisan/express-ts-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/the-app-artisan/express-ts-api/issues"
+  },
+  "homepage": "https://github.com/the-app-artisan/express-ts-api#readme",
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2"
+  }
+}
