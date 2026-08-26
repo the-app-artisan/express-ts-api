@@ -1,6 +1,10 @@
 import type { Request, Response } from 'express';
 import contactsService from './contacts.service';
 import { createContactSchema, updateContactSchema } from './contacts.schemas';
+import {
+  BadRequestError,
+  NotFoundError,
+} from '../../shared/errors/custom-errors';
 
 type ContactServiceType = typeof contactsService;
 
@@ -22,37 +26,22 @@ class ContactController {
     const contactId = Number(id);
 
     if (isNaN(contactId)) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'Invalid contact ID' });
+      throw new BadRequestError('Invalid contact ID');
     }
 
     const contact = await this.contactService.get(contactId, TEMP_USER_ID);
 
     if (!contact) {
-      return res
-        .status(404)
-        .json({ success: false, message: 'Contact not found' });
+      throw new NotFoundError('Contact not found');
     }
 
     return res.status(200).json({ success: true, data: contact });
   }
 
   async create(req: Request, res: Response) {
-    const validation = await createContactSchema.safeParse(req.body);
+    const data = await createContactSchema.parse(req.body);
 
-    if (!validation.success) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: validation.error.issues,
-      });
-    }
-
-    const contact = await this.contactService.create(
-      validation.data,
-      TEMP_USER_ID,
-    );
+    const contact = await this.contactService.create(data, TEMP_USER_ID);
 
     return res.status(201).json({ success: true, data: contact });
   }
@@ -63,31 +52,19 @@ class ContactController {
     const contactId = Number(id);
 
     if (isNaN(contactId)) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'Invalid contact ID' });
+      throw new BadRequestError('Invalid contact ID');
     }
 
-    const validation = await updateContactSchema.safeParse(req.body);
-
-    if (!validation.success) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation failed',
-        errors: validation.error.issues,
-      });
-    }
+    const data = await updateContactSchema.parse(req.body);
 
     const contact = await this.contactService.update(
       contactId,
-      validation.data,
+      data,
       TEMP_USER_ID,
     );
 
     if (!contact) {
-      return res
-        .status(404)
-        .json({ success: false, message: 'Contact not found' });
+      throw new NotFoundError('Contact not found');
     }
 
     return res.status(200).json({ success: true, data: contact });
@@ -99,17 +76,13 @@ class ContactController {
     const contactId = Number(id);
 
     if (isNaN(contactId)) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'Invalid contact ID' });
+      throw new BadRequestError('Invalid contact ID');
     }
 
     const result = await this.contactService.delete(contactId, TEMP_USER_ID);
 
     if (!result) {
-      return res
-        .status(404)
-        .json({ success: false, message: 'Contact not found' });
+      throw new NotFoundError('Contact not found');
     }
 
     return res.status(204).json({ success: true });
