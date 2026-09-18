@@ -13,11 +13,12 @@ datasource db {
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  email    String    @unique
-  name     String
-  password String
-  contacts Contact[]
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  name         String
+  password     String
+  lastLogoutAt DateTime?
+  contacts     Contact[]
 }
 
 model Contact {
@@ -27,6 +28,6 @@ model Contact {
   email     String
   phone     String?
   address   String?
-  user      User?   @relation(fields: [userId], references: [id])
+  user      User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int?
 }

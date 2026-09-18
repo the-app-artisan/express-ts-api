@@ -5,22 +5,20 @@ import {
   BadRequestError,
   NotFoundError,
 } from '../../shared/errors/custom-errors';
+import type { AuthRequest } from '../auth/auth.types';
 
 type ContactServiceType = typeof contactsService;
-
-// Until auth is implemented
-const TEMP_USER_ID = 1;
 
 class ContactController {
   constructor(private contactService: ContactServiceType) {}
 
-  async list(req: Request, res: Response) {
-    const contacts = await this.contactService.list(TEMP_USER_ID);
+  async list(req: AuthRequest, res: Response) {
+    const contacts = await this.contactService.list(req.user!.id);
 
     return res.status(200).json({ success: true, data: contacts });
   }
 
-  async get(req: Request, res: Response) {
+  async get(req: AuthRequest, res: Response) {
     const { id } = req.params;
 
     const contactId = Number(id);
@@ -29,7 +27,7 @@ class ContactController {
       throw new BadRequestError('Invalid contact ID');
     }
 
-    const contact = await this.contactService.get(contactId, TEMP_USER_ID);
+    const contact = await this.contactService.get(contactId, req.user!.id);
 
     if (!contact) {
       throw new NotFoundError('Contact not found');
@@ -38,15 +36,15 @@ class ContactController {
     return res.status(200).json({ success: true, data: contact });
   }
 
-  async create(req: Request, res: Response) {
+  async create(req: AuthRequest, res: Response) {
     const data = await createContactSchema.parse(req.body);
 
-    const contact = await this.contactService.create(data, TEMP_USER_ID);
+    const contact = await this.contactService.create(data, req.user!.id);
 
     return res.status(201).json({ success: true, data: contact });
   }
 
-  async update(req: Request, res: Response) {
+  async update(req: AuthRequest, res: Response) {
     const { id } = req.params;
 
     const contactId = Number(id);
@@ -60,7 +58,7 @@ class ContactController {
     const contact = await this.contactService.update(
       contactId,
       data,
-      TEMP_USER_ID,
+      req.user!.id,
     );
 
     if (!contact) {
@@ -70,7 +68,7 @@ class ContactController {
     return res.status(200).json({ success: true, data: contact });
   }
 
-  async delete(req: Request, res: Response) {
+  async delete(req: AuthRequest, res: Response) {
     const { id } = req.params;
 
     const contactId = Number(id);
@@ -79,13 +77,13 @@ class ContactController {
       throw new BadRequestError('Invalid contact ID');
     }
 
-    const result = await this.contactService.delete(contactId, TEMP_USER_ID);
+    const result = await this.contactService.delete(contactId, req.user!.id);
 
     if (!result) {
       throw new NotFoundError('Contact not found');
     }
 
-    return res.status(204).json({ success: true });
+    return res.status(204).json();
   }
 }
 

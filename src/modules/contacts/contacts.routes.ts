@@ -1,7 +1,10 @@
 import { Router, type Request, type Response } from 'express';
 import contactsController from './contacts.controller';
+import { authenticate } from '../auth/auth.middleware';
 
 const router = Router();
+
+router.use(authenticate);
 
 router.get('/', (req: Request, res: Response) => {
   return contactsController.list(req, res);
