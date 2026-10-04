@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/the-app-artisan/express-ts-api#readme",
   "devDependencies": {
+    "@faker-js/faker": "^10.6.0",
     "@types/bcrypt": "^6.0.0",
     "@types/better-sqlite3": "^9.6.0",
     "@types/express": "^5.0.6",
