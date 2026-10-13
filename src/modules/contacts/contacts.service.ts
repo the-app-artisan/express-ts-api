@@ -1,14 +1,34 @@
 import { prisma } from '../../lib/prisma';
 import type {
+  ContactsPaginationInput,
   CreateContactInput,
   UpdateContactInput,
 } from './contacts.schemas';
 
 class ContactService {
-  async list(userId: number) {
-    return prisma.contact.findMany({
-      where: { userId },
-    });
+  async list(userId: number, pagination: ContactsPaginationInput) {
+    const { page, limit } = pagination;
+    const skip = (page - 1) * limit;
+
+    const [items, total] = await prisma.$transaction([
+      prisma.contact.findMany({
+        where: { userId },
+        orderBy: { id: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.contact.count({
+        where: { userId },
+      }),
+    ]);
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async get(id: number, userId: number) {

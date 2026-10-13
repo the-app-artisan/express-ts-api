@@ -1,6 +1,10 @@
 import type { Request, Response } from 'express';
 import contactsService from './contacts.service';
-import { createContactSchema, updateContactSchema } from './contacts.schemas';
+import {
+  contactsPaginationSchema,
+  createContactSchema,
+  updateContactSchema,
+} from './contacts.schemas';
 import {
   BadRequestError,
   NotFoundError,
@@ -13,9 +17,20 @@ class ContactController {
   constructor(private contactService: ContactServiceType) {}
 
   async list(req: AuthRequest, res: Response) {
-    const contacts = await this.contactService.list(req.user!.id);
+    const data = contactsPaginationSchema.parse(req.query);
 
-    return res.status(200).json({ success: true, data: contacts });
+    const result = await this.contactService.list(req.user!.id, data);
+
+    return res.status(200).json({
+      success: true,
+      data: result.items,
+      pagination: {
+        total: result.total,
+        page: result.page,
+        limit: result.limit,
+        totalPages: result.totalPages,
+      },
+    });
   }
 
   async get(req: AuthRequest, res: Response) {

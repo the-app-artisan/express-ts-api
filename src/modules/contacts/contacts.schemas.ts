@@ -10,5 +10,11 @@ export const createContactSchema = z.object({
 
 export const updateContactSchema = createContactSchema.partial();
 
+export const contactsPaginationSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(10),
+});
+
 export type CreateContactInput = z.infer<typeof createContactSchema>;
 export type UpdateContactInput = z.infer<typeof updateContactSchema>;
+export type ContactsPaginationInput = z.infer<typeof contactsPaginationSchema>;
